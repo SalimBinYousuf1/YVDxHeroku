@@ -3,36 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TasVID - Take a LEAP</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>TasVID - YouTube Video/Audio Downloader</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="cream-theme">
-    <div class="landing-container">
-        <div class="landing-content">
-            <h1 class="landing-title">Take a <span class="highlight">LEAP</span></h1>
-            <p class="landing-subtitle">Download YouTube videos and audio with ease</p>
-            <a href="{{ url_for('downloader.main') }}" class="btn btn-primary btn-large">
-                <i class="fas fa-rocket"></i> Try it now
-            </a>
-        </div>
-        <div class="landing-footer">
-            <div class="auth-links">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('downloader.history') }}">My Downloads</a>
-                    <a href="{{ url_for('auth.settings') }}">Settings</a>
-                    <a href="{{ url_for('auth.logout') }}">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}">Login</a>
-                    <a href="{{ url_for('auth.signup') }}">Sign Up</a>
-                {% endif %}
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{{ url_for('main.index') }}" class="logo">
+                    <i class="fas fa-video logo-icon"></i>
+                    <span class="logo-text">Tas<span class="highlight">VID</span></span>
+                </a>
+                
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                    <li><a href="{{ url_for('downloader.main') }}">Downloader</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('downloader.history') }}">History</a></li>
+                        <li><a href="{{ url_for('auth.settings') }}">Settings</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                        <li><a href="{{ url_for('auth.signup') }}">Sign Up</a></li>
+                    {% endif %}
+                </ul>
             </div>
-            <div class="footer-links">
-                <a href="{{ url_for('main.about') }}">About</a>
-                <a href="{{ url_for('main.contact') }}">Contact</a>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="landing-container">
+            <div class="landing-bg"></div>
+            
+            <div class="landing-content">
+                <h1 class="landing-title">Take a LEAP</h1>
+                <p class="landing-subtitle">Download YouTube videos and audio with the most versatile, powerful, and beautiful downloader.</p>
+                
+                <div class="landing-features">
+                    <div class="feature-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Mobile Friendly</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Lightning Fast</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure & Private</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Advanced Options</span>
+                    </div>
+                </div>
+                
+                <div class="landing-cta">
+                    <a href="{{ url_for('downloader.main') }}" class="btn btn-primary btn-large">
+                        <i class="fas fa-rocket"></i> Try it now
+                    </a>
+                </div>
+            </div>
+            
+            <div class="landing-footer">
+                <div class="auth-links">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.settings') }}">Settings</a>
+                        <a href="{{ url_for('auth.logout') }}">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}">Login</a>
+                        <a href="{{ url_for('auth.signup') }}">Sign Up</a>
+                    {% endif %}
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <i class="fas fa-video logo-icon"></i>
+                        <span class="logo-text">Tas<span class="highlight">VID</span></span>
+                    </div>
+                    <p class="tagline">The most versatile YouTube video/audio downloader with a beautiful UI and powerful features.</p>
+                    
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h3>Quick Links</h3>
+                        <ul>
+                            <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                            <li><a href="{{ url_for('downloader.main') }}">Downloader</a></li>
+                            <li><a href="{{ url_for('downloader.history') }}">History</a></li>
+                            <li><a href="{{ url_for('auth.settings') }}">Settings</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h3>Features</h3>
+                        <ul>
+                            <li><a href="#">Video Download</a></li>
+                            <li><a href="#">Audio Extraction</a></li>
+                            <li><a href="#">Batch Processing</a></li>
+                            <li><a href="#">Format Conversion</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Report Issue</a></li>
+                            <li><a href="#">Documentation</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 TasVID. All rights reserved.</p>
+                <p>Made with <i class="fas fa-heart"></i> by SalimBinYousuf1</p>
+            </div>
+        </div>
+    </footer>
+    
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

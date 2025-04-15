@@ -3,6 +3,19 @@ import re
 import qrcode
 from PIL import Image
 
+def create_directory(directory_path):
+    """
+    Create directory if it doesn't exist
+    
+    Args:
+        directory_path: Path to directory
+    
+    Returns:
+        Path to created directory
+    """
+    os.makedirs(directory_path, exist_ok=True)
+    return directory_path
+
 def clean_filename(filename):
     """
     Clean filename to make it safe for file systems

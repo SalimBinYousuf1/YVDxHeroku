@@ -4,100 +4,236 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TasVID - Settings</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="{{ settings.theme if settings else 'cream' }}-theme">
+<body class="{{ settings.theme }}">
+    <!-- Header -->
     {% include 'includes/header.html' %}
     
-    <main class="container">
-        <div class="settings-container">
-            <h1 class="section-title">Settings</h1>
+    <!-- Main Content -->
+    <main>
+        <div class="container settings-container">
+            <h1 class="section-title">User Settings</h1>
             
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <div class="flash-messages">
-                        {% for message in messages %}
-                            <div class="flash-message">{{ message }}</div>
-                        {% endfor %}
+            <div class="settings-grid">
+                <!-- Theme Settings -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <h2><i class="fas fa-palette"></i> Theme Settings</h2>
                     </div>
-                {% endif %}
-            {% endwith %}
-            
-            <form method="POST" action="{{ url_for('auth.settings') }}" class="settings-form">
-                <div class="settings-section">
-                    <h2>Appearance</h2>
-                    <div class="form-group">
-                        <label>Theme</label>
-                        <div class="theme-options">
-                            <div class="theme-option">
-                                <input type="radio" id="theme-cream" name="theme" value="cream" {% if not settings or settings.theme == 'cream' %}checked{% endif %}>
-                                <label for="theme-cream" class="theme-preview cream-preview">
-                                    <span>Cream</span>
-                                </label>
+                    
+                    <div class="settings-content">
+                        <form action="{{ url_for('auth.settings') }}" method="POST">
+                            <div class="theme-options">
+                                <div class="theme-option">
+                                    <input type="radio" name="theme" id="cream-theme" value="cream-theme" {% if settings.theme == 'cream-theme' %}checked{% endif %}>
+                                    <label for="cream-theme" class="theme-preview cream-theme">
+                                        <span class="theme-name">Cream</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="theme-option">
+                                    <input type="radio" name="theme" id="dark-theme" value="dark-theme" {% if settings.theme == 'dark-theme' %}checked{% endif %}>
+                                    <label for="dark-theme" class="theme-preview dark-theme">
+                                        <span class="theme-name">Dark</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="theme-option">
+                                    <input type="radio" name="theme" id="neon-theme" value="neon-theme" {% if settings.theme == 'neon-theme' %}checked{% endif %}>
+                                    <label for="neon-theme" class="theme-preview neon-theme">
+                                        <span class="theme-name">Neon</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="theme-option">
+                                    <input type="radio" name="theme" id="dot-theme" value="dot-theme" {% if settings.theme == 'dot-theme' %}checked{% endif %}>
+                                    <label for="dot-theme" class="theme-preview dot-theme">
+                                        <span class="theme-name">Dot</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="theme-option">
+                                    <input type="radio" name="theme" id="midnight-theme" value="midnight-theme" {% if settings.theme == 'midnight-theme' %}checked{% endif %}>
+                                    <label for="midnight-theme" class="theme-preview midnight-theme">
+                                        <span class="theme-name">Midnight</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="theme-option">
+                                    <input type="radio" name="theme" id="forest-theme" value="forest-theme" {% if settings.theme == 'forest-theme' %}checked{% endif %}>
+                                    <label for="forest-theme" class="theme-preview forest-theme">
+                                        <span class="theme-name">Forest</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="theme-option">
+                                    <input type="radio" name="theme" id="sunset-theme" value="sunset-theme" {% if settings.theme == 'sunset-theme' %}checked{% endif %}>
+                                    <label for="sunset-theme" class="theme-preview sunset-theme">
+                                        <span class="theme-name">Sunset</span>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="theme-option">
-                                <input type="radio" id="theme-dark" name="theme" value="dark" {% if settings and settings.theme == 'dark' %}checked{% endif %}>
-                                <label for="theme-dark" class="theme-preview dark-preview">
-                                    <span>Dark</span>
-                                </label>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Theme
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Download Settings -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <h2><i class="fas fa-download"></i> Download Settings</h2>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <form action="{{ url_for('auth.settings') }}" method="POST">
+                            <div class="form-group">
+                                <label for="default-quality">Default Video Quality:</label>
+                                <select class="form-control" id="default-quality" name="default_quality">
+                                    <option value="4K" {% if settings.default_quality == '4K' %}selected{% endif %}>4K (2160p)</option>
+                                    <option value="1440p" {% if settings.default_quality == '1440p' %}selected{% endif %}>1440p</option>
+                                    <option value="1080p" {% if settings.default_quality == '1080p' %}selected{% endif %}>1080p</option>
+                                    <option value="720p" {% if settings.default_quality == '720p' %}selected{% endif %}>720p</option>
+                                    <option value="480p" {% if settings.default_quality == '480p' %}selected{% endif %}>480p</option>
+                                    <option value="360p" {% if settings.default_quality == '360p' %}selected{% endif %}>360p</option>
+                                </select>
                             </div>
-                            <div class="theme-option">
-                                <input type="radio" id="theme-neon" name="theme" value="neon" {% if settings and settings.theme == 'neon' %}checked{% endif %}>
-                                <label for="theme-neon" class="theme-preview neon-preview">
-                                    <span>Neon</span>
-                                </label>
+                            
+                            <div class="form-group">
+                                <label for="default-format">Default Format:</label>
+                                <select class="form-control" id="default-format" name="default_format">
+                                    <option value="mp4" {% if settings.default_format == 'mp4' %}selected{% endif %}>MP4</option>
+                                    <option value="webm" {% if settings.default_format == 'webm' %}selected{% endif %}>WebM</option>
+                                    <option value="mp3" {% if settings.default_format == 'mp3' %}selected{% endif %}>MP3 (Audio)</option>
+                                    <option value="m4a" {% if settings.default_format == 'm4a' %}selected{% endif %}>M4A (Audio)</option>
+                                </select>
                             </div>
-                            <div class="theme-option">
-                                <input type="radio" id="theme-dot" name="theme" value="dot" {% if settings and settings.theme == 'dot' %}checked{% endif %}>
-                                <label for="theme-dot" class="theme-preview dot-preview">
-                                    <span>Dot</span>
-                                </label>
+                            
+                            <div class="form-group">
+                                <label for="compression-level">Default Compression Level:</label>
+                                <select class="form-control" id="compression-level" name="compression_level">
+                                    <option value="none" {% if settings.compression_level == 'none' %}selected{% endif %}>No Compression</option>
+                                    <option value="light" {% if settings.compression_level == 'light' %}selected{% endif %}>Light Compression</option>
+                                    <option value="medium" {% if settings.compression_level == 'medium' %}selected{% endif %}>Medium Compression</option>
+                                    <option value="heavy" {% if settings.compression_level == 'heavy' %}selected{% endif %}>Heavy Compression</option>
+                                </select>
                             </div>
+                            
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="save-history" name="save_history" {% if settings.save_history %}checked{% endif %}>
+                                <label for="save-history">Save Download History</label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Download Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Account Settings -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <h2><i class="fas fa-user-cog"></i> Account Settings</h2>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <div class="account-info">
+                            <div class="info-item">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">{{ current_user.email }}</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Member Since:</span>
+                                <span class="info-value">{{ current_user.registered_on.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="password-change">
+                            <h3>Change Password</h3>
+                            
+                            <form action="{{ url_for('auth.change_password') }}" method="POST">
+                                <div class="form-group">
+                                    <label for="current-password">Current Password:</label>
+                                    <input type="password" class="form-control" id="current-password" name="current_password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="new-password">New Password:</label>
+                                    <input type="password" class="form-control" id="new-password" name="new_password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirm New Password:</label>
+                                    <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
                 
-                <div class="settings-section">
-                    <h2>Download Preferences</h2>
-                    <div class="form-group">
-                        <label for="default_quality">Default Video Quality</label>
-                        <select id="default_quality" name="default_quality">
-                            <option value="144p" {% if settings and settings.default_quality == '144p' %}selected{% endif %}>144p</option>
-                            <option value="240p" {% if settings and settings.default_quality == '240p' %}selected{% endif %}>240p</option>
-                            <option value="360p" {% if settings and settings.default_quality == '360p' %}selected{% endif %}>360p</option>
-                            <option value="480p" {% if settings and settings.default_quality == '480p' %}selected{% endif %}>480p</option>
-                            <option value="720p" {% if not settings or settings.default_quality == '720p' %}selected{% endif %}>720p (Recommended)</option>
-                            <option value="1080p" {% if settings and settings.default_quality == '1080p' %}selected{% endif %}>1080p</option>
-                            <option value="1440p" {% if settings and settings.default_quality == '1440p' %}selected{% endif %}>1440p</option>
-                            <option value="2160p" {% if settings and settings.default_quality == '2160p' %}selected{% endif %}>2160p (4K)</option>
-                        </select>
+                <!-- Data Management -->
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <h2><i class="fas fa-database"></i> Data Management</h2>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="default_format">Default Format</label>
-                        <select id="default_format" name="default_format">
-                            <option value="mp4" {% if not settings or settings.default_format == 'mp4' %}selected{% endif %}>MP4</option>
-                            <option value="webm" {% if settings and settings.default_format == 'webm' %}selected{% endif %}>WebM</option>
-                            <option value="mp3" {% if settings and settings.default_format == 'mp3' %}selected{% endif %}>MP3 (Audio)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="save_location">Custom Save Location (Optional)</label>
-                        <input type="text" id="save_location" name="save_location" value="{{ settings.save_location if settings and settings.save_location else '' }}" placeholder="Leave empty for default location">
+                    <div class="settings-content">
+                        <div class="data-actions">
+                            <a href="{{ url_for('downloader.history') }}" class="btn btn-secondary">
+                                <i class="fas fa-history"></i> View Download History
+                            </a>
+                            
+                            <a href="{{ url_for('downloader.clear_history') }}" class="btn btn-danger" 
+                               onclick="return confirm('Are you sure you want to clear your entire download history? This action cannot be undone.')">
+                                <i class="fas fa-trash"></i> Clear Download History
+                            </a>
+                        </div>
+                        
+                        <div class="storage-info">
+                            <h3>Storage Usage</h3>
+                            
+                            <div class="storage-bar">
+                                <div class="storage-progress" style="width: 35%"></div>
+                            </div>
+                            
+                            <div class="storage-details">
+                                <span>1.2 GB used of 5 GB</span>
+                                <a href="#" class="btn btn-sm btn-outline">Manage Storage</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn btn-primary btn-block">
-                    <i class="fas fa-save"></i> Save Settings
-                </button>
-            </form>
+            </div>
         </div>
     </main>
     
+    <!-- Footer -->
     {% include 'includes/footer.html' %}
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme preview functionality
+            const themeRadios = document.querySelectorAll('input[name="theme"]');
+            const body = document.body;
+            
+            themeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    body.className = this.value;
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -2,6 +2,7 @@ from flask import Flask
 from flask_caching import Cache
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 
@@ -12,6 +13,7 @@ load_dotenv()
 cache = Cache()
 login_manager = LoginManager()
 mail = Mail()
+db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
@@ -48,8 +50,9 @@ def create_app():
     app.register_blueprint(downloader_bp, url_prefix='/downloader')
     
     # Create database tables
-    from app.models.user import db
+    from app.models.user import User
     from app.models.download_history import DownloadHistory
+    from app.models.user_settings import UserSettings
     
     with app.app_context():
         db.init_app(app)

@@ -4,69 +4,220 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TasVID - Verify OTP</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="cream-theme">
+    <!-- Header -->
     {% include 'includes/header.html' %}
     
-    <main class="container">
-        <div class="auth-container">
-            <h1 class="section-title">Verify Your Email</h1>
-            
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <div class="flash-messages">
-                        {% for message in messages %}
-                            <div class="flash-message">{{ message }}</div>
+    <!-- Main Content -->
+    <main>
+        <div class="container auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1><i class="fas fa-shield-alt"></i> Verify Your Email</h1>
+                    <p>We've sent a verification code to <strong>{{ email }}</strong></p>
+                </div>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
                         {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <div class="auth-content">
+                    <form action="{{ url_for('auth.verify_otp', email=email) }}" method="POST">
+                        <div class="otp-container">
+                            <label for="otp">Enter 6-Digit Verification Code:</label>
+                            <div class="otp-input-group">
+                                <input type="text" class="otp-input" name="otp" id="otp" maxlength="6" pattern="[0-9]{6}" required>
+                                <button type="button" class="copy-otp" id="copy-otp" title="Copy from clipboard">
+                                    <i class="fas fa-paste"></i>
+                                </button>
+                            </div>
+                            <div class="otp-timer">
+                                Code expires in <span id="timer">05:00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-check-circle"></i> Verify Code
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="auth-links">
+                        <span>Didn't receive the code?</span>
+                        <a href="{{ url_for('auth.resend_otp', email=email) }}">Resend Code</a>
                     </div>
-                {% endif %}
-            {% endwith %}
-            
-            <div class="otp-info">
-                <p>We've sent a verification code to <strong>{{ email }}</strong></p>
-                <p>Please check your inbox and enter the code below.</p>
+                    
+                    <div class="auth-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Please check your spam folder if you don't see the email in your inbox. The verification code is valid for 30 minutes.</p>
+                    </div>
+                </div>
             </div>
             
-            <form method="POST" action="{{ url_for('auth.verify_otp') }}" class="auth-form">
-                <div class="form-group">
-                    <label for="otp">Verification Code</label>
-                    <div class="otp-input-container">
-                        <input type="text" id="otp" name="otp" required maxlength="6" pattern="[0-9]{6}">
-                        <button type="button" id="copy-otp" class="btn btn-icon" title="Copy OTP">
-                            <i class="fas fa-copy"></i>
-                        </button>
+            <div class="auth-features">
+                <h2>Email Verification Benefits</h2>
+                
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Enhanced Security</h3>
+                            <p>Verification helps protect your account from unauthorized access.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Download Notifications</h3>
+                            <p>Receive alerts when your downloads are complete.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Account Recovery</h3>
+                            <p>Easily recover your account if you forget your password.</p>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="password">Create Password</label>
-                    <input type="password" id="password" name="password" required minlength="8">
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-block">
-                    <i class="fas fa-check-circle"></i> Verify & Create Account
-                </button>
-            </form>
+            </div>
         </div>
     </main>
     
+    <!-- Footer -->
     {% include 'includes/footer.html' %}
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        // OTP copy functionality
-        document.getElementById('copy-otp').addEventListener('click', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // OTP Timer
+            let timeLeft = 300; // 5 minutes in seconds
+            const timerElement = document.getElementById('timer');
+            
+            const timer = setInterval(function() {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerElement.textContent = '00:00';
+                    timerElement.parentElement.innerHTML += ' <span class="expired">(Expired)</span>';
+                }
+            }, 1000);
+            
+            // Copy from clipboard button
+            const copyButton = document.getElementById('copy-otp');
             const otpInput = document.getElementById('otp');
-            if (otpInput.value) {
-                navigator.clipboard.writeText(otpInput.value);
-                this.innerHTML = '<i class="fas fa-check"></i>';
-                setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-copy"></i>';
-                }, 2000);
-            }
+            
+            copyButton.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    // Try to extract a 6-digit number from the clipboard text
+                    const match = text.match(/\d{6}/);
+                    if (match) {
+                        otpInput.value = match[0];
+                        showToast('OTP pasted from clipboard', 'success');
+                    } else {
+                        showToast('No valid OTP found in clipboard', 'error');
+                    }
+                } catch (err) {
+                    showToast('Failed to read clipboard', 'error');
+                }
+            });
+            
+            // Auto-submit when 6 digits are entered
+            otpInput.addEventListener('input', function() {
+                if (this.value.length === 6 && /^\d{6}$/.test(this.value)) {
+                    this.form.submit();
+                }
+            });
         });
+        
+        // Toast notification
+        function showToast(message, type = 'info') {
+            // Create toast container if it doesn't exist
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'toast-container';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Create toast
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            // Set icon based on type
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            if (type === 'error') icon = 'times-circle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+                <button class="toast-close"><i class="fas fa-times"></i></button>
+            `;
+            
+            // Add to container
+            toastContainer.appendChild(toast);
+            
+            // Add animation
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Add event listener to close button
+            const closeButton = toast.querySelector('.toast-close');
+            closeButton.addEventListener('click', function() {
+                closeToast(toast);
+            });
+            
+            // Auto close after 5 seconds
+            setTimeout(() => {
+                closeToast(toast);
+            }, 5000);
+        }
+        
+        // Close Toast
+        function closeToast(toast) {
+            toast.classList.remove('show');
+            
+            // Remove after animation
+            setTimeout(() => {
+                toast.remove();
+                
+                // Remove container if empty
+                const toastContainer = document.getElementById('toast-container');
+                if (toastContainer && toastContainer.children.length === 0) {
+                    toastContainer.remove();
+                }
+            }, 300);
+        }
     </script>
 </body>
 </html>

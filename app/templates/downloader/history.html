@@ -3,60 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TasVID - Download History</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>TasVID - History</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="{{ settings.theme if settings else 'cream' }}-theme">
+<body class="cream-theme">
+    <!-- Header -->
     {% include 'includes/header.html' %}
     
-    <main class="container">
-        <div class="history-container">
+    <!-- Main Content -->
+    <main>
+        <div class="container history-container">
             <h1 class="section-title">Download History</h1>
             
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <div class="flash-messages">
-                        {% for message in messages %}
-                            <div class="flash-message">{{ message }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endwith %}
+            <div class="history-filters">
+                <div class="filter-group">
+                    <span class="filter-label">Filter:</span>
+                    <select class="form-control" id="filter-type">
+                        <option value="all">All Types</option>
+                        <option value="video">Video Only</option>
+                        <option value="audio">Audio Only</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <span class="filter-label">Sort:</span>
+                    <select class="form-control" id="sort-by">
+                        <option value="date-desc">Newest First</option>
+                        <option value="date-asc">Oldest First</option>
+                        <option value="size-desc">Largest Size</option>
+                        <option value="size-asc">Smallest Size</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-danger btn-sm" id="clear-history-btn">
+                    <i class="fas fa-trash"></i> Clear History
+                </button>
+            </div>
             
-            {% if downloads %}
-                <div class="history-list">
-                    {% for download in downloads %}
-                        <div class="history-item">
+            {% if history_items %}
+                <div class="history-list" id="history-list">
+                    {% for item in history_items %}
+                        <div class="history-item" data-type="{{ item.type }}" data-date="{{ item.date }}" data-size="{{ item.size }}">
                             <div class="history-thumbnail">
-                                <img src="{{ download.thumbnail_url }}" alt="{{ download.title }}">
+                                <img src="{{ item.thumbnail }}" alt="{{ item.title }}">
                             </div>
                             <div class="history-details">
-                                <h3>{{ download.title }}</h3>
+                                <h3>{{ item.title }}</h3>
                                 <div class="history-meta">
-                                    <span class="format-badge {{ download.format_type }}">
-                                        <i class="fas fa-{{ 'video' if download.format_type == 'video' else 'music' }}"></i>
-                                        {{ download.format_type|capitalize }}
-                                    </span>
-                                    {% if download.resolution %}
-                                        <span class="resolution-badge">{{ download.resolution }}</span>
-                                    {% endif %}
-                                    <span class="size-badge">{{ download.file_size }} MB</span>
-                                    <span class="date-badge">
-                                        <i class="far fa-calendar-alt"></i>
-                                        {{ download.download_date.strftime('%b %d, %Y') }}
-                                    </span>
+                                    <span class="format-badge {{ item.type }}">{{ item.type|capitalize }}</span>
+                                    <span class="resolution-badge">{{ item.resolution }}</span>
+                                    <span class="size-badge"><i class="fas fa-file"></i> {{ item.size }}</span>
+                                    <span class="date-badge"><i class="fas fa-calendar"></i> {{ item.date }}</span>
                                 </div>
                                 <div class="history-actions">
-                                    <a href="{{ download.file_path }}" class="btn btn-sm btn-primary" download>
+                                    <button class="btn btn-sm btn-primary redownload-btn" data-url="{{ item.url }}">
                                         <i class="fas fa-download"></i> Redownload
-                                    </a>
-                                    <a href="{{ url_for('downloader.generate_qr', id=download.id) }}" class="btn btn-sm btn-secondary">
-                                        <i class="fas fa-qrcode"></i> QR Code
-                                    </a>
-                                    <a href="{{ url_for('downloader.delete_history', id=download.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this download history?')">
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary location-btn" data-path="{{ item.path }}">
+                                        <i class="fas fa-folder-open"></i> Location
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-btn" data-id="{{ item.id }}">
                                         <i class="fas fa-trash"></i> Delete
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -64,11 +74,9 @@
                 </div>
             {% else %}
                 <div class="empty-history">
-                    <div class="empty-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h3>No Downloads Yet</h3>
-                    <p>Your download history will appear here</p>
+                    <i class="fas fa-history empty-icon"></i>
+                    <h3>No Download History</h3>
+                    <p>Your download history will appear here once you download videos or audio.</p>
                     <a href="{{ url_for('downloader.main') }}" class="btn btn-primary">
                         <i class="fas fa-download"></i> Start Downloading
                     </a>
@@ -77,8 +85,151 @@
         </div>
     </main>
     
+    <!-- Footer -->
     {% include 'includes/footer.html' %}
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter and Sort Functionality
+            const filterType = document.getElementById('filter-type');
+            const sortBy = document.getElementById('sort-by');
+            const historyList = document.getElementById('history-list');
+            const historyItems = document.querySelectorAll('.history-item');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            
+            if (!historyList) return;
+            
+            // Filter history items
+            filterType.addEventListener('change', function() {
+                const type = this.value;
+                
+                historyItems.forEach(item => {
+                    if (type === 'all' || item.getAttribute('data-type') === type) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Sort history items
+            sortBy.addEventListener('change', function() {
+                const sort = this.value;
+                const items = Array.from(historyItems);
+                
+                items.sort((a, b) => {
+                    if (sort === 'date-desc') {
+                        return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                    } else if (sort === 'date-asc') {
+                        return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                    } else if (sort === 'size-desc') {
+                        return parseFloat(b.getAttribute('data-size')) - parseFloat(a.getAttribute('data-size'));
+                    } else if (sort === 'size-asc') {
+                        return parseFloat(a.getAttribute('data-size')) - parseFloat(b.getAttribute('data-size'));
+                    }
+                });
+                
+                // Reorder items in the DOM
+                items.forEach(item => {
+                    historyList.appendChild(item);
+                });
+            });
+            
+            // Clear history confirmation
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear your entire download history? This action cannot be undone.')) {
+                    // Send AJAX request to clear history
+                    fetch('{{ url_for("downloader.clear_history") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Reload page to show empty history
+                            window.location.reload();
+                        } else {
+                            showToast('Failed to clear history: ' + data.error, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showToast('An error occurred: ' + error, 'error');
+                    });
+                }
+            });
+            
+            // Redownload button
+            const redownloadBtns = document.querySelectorAll('.redownload-btn');
+            redownloadBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const url = this.getAttribute('data-url');
+                    window.location.href = '{{ url_for("downloader.main") }}?url=' + encodeURIComponent(url);
+                });
+            });
+            
+            // Location button
+            const locationBtns = document.querySelectorAll('.location-btn');
+            locationBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const path = this.getAttribute('data-path');
+                    
+                    // Copy path to clipboard
+                    navigator.clipboard.writeText(path)
+                        .then(() => {
+                            showToast('File path copied to clipboard', 'success');
+                        })
+                        .catch(err => {
+                            showToast('Failed to copy path', 'error');
+                        });
+                });
+            });
+            
+            // Delete button
+            const deleteBtns = document.querySelectorAll('.delete-btn');
+            deleteBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const historyItem = this.closest('.history-item');
+                    
+                    if (confirm('Are you sure you want to delete this item from your history?')) {
+                        // Send AJAX request to delete item
+                        fetch('{{ url_for("downloader.delete_history_item", item_id="") }}' + id, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Remove item with animation
+                                historyItem.classList.add('slide-out-right');
+                                setTimeout(() => {
+                                    historyItem.remove();
+                                    
+                                    // Check if list is empty
+                                    if (historyList.children.length === 0) {
+                                        window.location.reload();
+                                    }
+                                }, 500);
+                                
+                                showToast('Item deleted from history', 'success');
+                            } else {
+                                showToast('Failed to delete item: ' + data.error, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            showToast('An error occurred: ' + error, 'error');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
