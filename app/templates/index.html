@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasVID - Take a LEAP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="cream-theme">
+    <div class="landing-container">
+        <div class="landing-content">
+            <h1 class="landing-title">Take a <span class="highlight">LEAP</span></h1>
+            <p class="landing-subtitle">Download YouTube videos and audio with ease</p>
+            <a href="{{ url_for('downloader.main') }}" class="btn btn-primary btn-large">
+                <i class="fas fa-rocket"></i> Try it now
+            </a>
+        </div>
+        <div class="landing-footer">
+            <div class="auth-links">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('downloader.history') }}">My Downloads</a>
+                    <a href="{{ url_for('auth.settings') }}">Settings</a>
+                    <a href="{{ url_for('auth.logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Login</a>
+                    <a href="{{ url_for('auth.signup') }}">Sign Up</a>
+                {% endif %}
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('main.about') }}">About</a>
+                <a href="{{ url_for('main.contact') }}">Contact</a>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

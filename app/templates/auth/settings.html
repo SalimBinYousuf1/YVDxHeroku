@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasVID - Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="{{ settings.theme if settings else 'cream' }}-theme">
+    {% include 'includes/header.html' %}
+    
+    <main class="container">
+        <div class="settings-container">
+            <h1 class="section-title">Settings</h1>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" action="{{ url_for('auth.settings') }}" class="settings-form">
+                <div class="settings-section">
+                    <h2>Appearance</h2>
+                    <div class="form-group">
+                        <label>Theme</label>
+                        <div class="theme-options">
+                            <div class="theme-option">
+                                <input type="radio" id="theme-cream" name="theme" value="cream" {% if not settings or settings.theme == 'cream' %}checked{% endif %}>
+                                <label for="theme-cream" class="theme-preview cream-preview">
+                                    <span>Cream</span>
+                                </label>
+                            </div>
+                            <div class="theme-option">
+                                <input type="radio" id="theme-dark" name="theme" value="dark" {% if settings and settings.theme == 'dark' %}checked{% endif %}>
+                                <label for="theme-dark" class="theme-preview dark-preview">
+                                    <span>Dark</span>
+                                </label>
+                            </div>
+                            <div class="theme-option">
+                                <input type="radio" id="theme-neon" name="theme" value="neon" {% if settings and settings.theme == 'neon' %}checked{% endif %}>
+                                <label for="theme-neon" class="theme-preview neon-preview">
+                                    <span>Neon</span>
+                                </label>
+                            </div>
+                            <div class="theme-option">
+                                <input type="radio" id="theme-dot" name="theme" value="dot" {% if settings and settings.theme == 'dot' %}checked{% endif %}>
+                                <label for="theme-dot" class="theme-preview dot-preview">
+                                    <span>Dot</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>Download Preferences</h2>
+                    <div class="form-group">
+                        <label for="default_quality">Default Video Quality</label>
+                        <select id="default_quality" name="default_quality">
+                            <option value="144p" {% if settings and settings.default_quality == '144p' %}selected{% endif %}>144p</option>
+                            <option value="240p" {% if settings and settings.default_quality == '240p' %}selected{% endif %}>240p</option>
+                            <option value="360p" {% if settings and settings.default_quality == '360p' %}selected{% endif %}>360p</option>
+                            <option value="480p" {% if settings and settings.default_quality == '480p' %}selected{% endif %}>480p</option>
+                            <option value="720p" {% if not settings or settings.default_quality == '720p' %}selected{% endif %}>720p (Recommended)</option>
+                            <option value="1080p" {% if settings and settings.default_quality == '1080p' %}selected{% endif %}>1080p</option>
+                            <option value="1440p" {% if settings and settings.default_quality == '1440p' %}selected{% endif %}>1440p</option>
+                            <option value="2160p" {% if settings and settings.default_quality == '2160p' %}selected{% endif %}>2160p (4K)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="default_format">Default Format</label>
+                        <select id="default_format" name="default_format">
+                            <option value="mp4" {% if not settings or settings.default_format == 'mp4' %}selected{% endif %}>MP4</option>
+                            <option value="webm" {% if settings and settings.default_format == 'webm' %}selected{% endif %}>WebM</option>
+                            <option value="mp3" {% if settings and settings.default_format == 'mp3' %}selected{% endif %}>MP3 (Audio)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="save_location">Custom Save Location (Optional)</label>
+                        <input type="text" id="save_location" name="save_location" value="{{ settings.save_location if settings and settings.save_location else '' }}" placeholder="Leave empty for default location">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+            </form>
+        </div>
+    </main>
+    
+    {% include 'includes/footer.html' %}
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-text">Tas<span class="highlight">VID</span></span>
+                <p class="tagline">YouTube Video/Audio Downloader</p>
+            </div>
+            
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h3>Navigation</h3>
+                    <ul>
+                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                        <li><a href="{{ url_for('downloader.main') }}">Downloader</a></li>
+                        <li><a href="{{ url_for('main.about') }}">About</a></li>
+                        <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Account</h3>
+                    <ul>
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('downloader.history') }}">My Downloads</a></li>
+                            <li><a href="{{ url_for('auth.settings') }}">Settings</a></li>
+                            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                            <li><a href="{{ url_for('auth.signup') }}">Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 TasVID. All rights reserved.</p>
+            <p>Built with <i class="fas fa-heart"></i> using Flask and yt-dlp</p>
+        </div>
+    </div>
+</footer>

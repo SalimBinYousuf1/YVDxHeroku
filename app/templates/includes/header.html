@@ -1,0 +1,27 @@
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <a href="{{ url_for('main.index') }}" class="logo">
+                <span class="logo-text">Tas<span class="highlight">VID</span></span>
+            </a>
+            
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('downloader.main') }}"><i class="fas fa-download"></i> Downloader</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('downloader.history') }}"><i class="fas fa-history"></i> History</a></li>
+                        <li><a href="{{ url_for('auth.settings') }}"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                        <li><a href="{{ url_for('auth.signup') }}"><i class="fas fa-user-plus"></i> Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasVID - YouTube Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="{{ settings.theme if settings else 'cream' }}-theme">
+    {% include 'includes/header.html' %}
+    
+    <main class="container">
+        <div class="downloader-container">
+            <h1 class="section-title">YouTube Downloader</h1>
+            
+            <div class="url-input-container">
+                <form id="analyze-form">
+                    <div class="input-group">
+                        <input type="url" id="youtube-url" name="url" placeholder="Enter YouTube URL (https://you...)" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Analyze
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="loading" class="loading-container" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing video...</p>
+            </div>
+            
+            <div id="video-info" class="video-info-container" style="display: none;">
+                <div class="video-details">
+                    <img id="video-thumbnail" src="" alt="Video thumbnail" class="video-thumbnail">
+                    <div class="video-metadata">
+                        <h2 id="video-title"></h2>
+                        <p id="video-duration"></p>
+                    </div>
+                </div>
+                
+                <div class="formats-container">
+                    <div class="format-section">
+                        <h3>Video Formats</h3>
+                        <div id="video-formats" class="format-list"></div>
+                    </div>
+                    
+                    <div class="format-section">
+                        <h3>Audio Formats</h3>
+                        <div id="audio-formats" class="format-list"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="download-progress" class="progress-container" style="display: none;">
+                <h3>Downloading: <span id="download-filename"></span></h3>
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <p id="progress-text">0%</p>
+                <button id="cancel-download" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+            
+            <div id="download-complete" class="complete-container" style="display: none;">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Download Complete!</h3>
+                <p id="download-path"></p>
+                <div class="action-buttons">
+                    <button id="new-download" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Download
+                    </button>
+                    <a id="view-history" href="{{ url_for('downloader.history') }}" class="btn btn-secondary">
+                        <i class="fas fa-history"></i> View History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    {% include 'includes/footer.html' %}
+    
+    <script src="{{ url_for('static', filename='js/downloader.js') }}"></script>
+</body>
+</html>
